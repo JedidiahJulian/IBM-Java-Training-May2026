@@ -24,10 +24,28 @@ public class Assignments {
                 System.out.println(getBlackjack(10, 11));
                 System.out.println(getBlackjack(5, 4));
             }else if (choices == 2){
+                System.out.println("Choose implementation: ");
+                System.out.println("1 - Traditional Switch Case Implementation");
+                System.out.println("2 - Pattern Matching for Switch");
                 System.out.print("Enter number: ");
-                int day = sc.nextInt();
+                int implementation = sc.nextInt();
 
-                System.out.println(getDay(day));
+                if (implementation == 1){
+                    System.out.print("Enter number (Traditional Switch Case): ");
+                    int day = sc.nextInt();
+
+                    System.out.println();
+                    System.out.println(getDay1(day));
+                    System.out.println();
+                }else if (implementation == 2){
+                    System.out.print("Enter number (Pattern Matching): ");
+                    int day = sc.nextInt();
+
+                    System.out.println();
+                    System.out.println(getDay2(day));
+                    System.out.println();
+                }
+
             }else if (choices == 3){
                 int number = 0;
 
@@ -57,7 +75,7 @@ public class Assignments {
         System.out.println();
     }
 
-    public static String getDay(int day){
+    public static String getDay1(int day){
         switch(day){
             case 1:
                return "Monday\n";
@@ -78,6 +96,21 @@ public class Assignments {
         }
     }
 
+    public static String getDay2(int day){
+       String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+
+       return switch (day){
+        case 1 -> days[0];
+        case 2 -> days[1];
+        case 3 -> days[2];
+        case 4 -> days[3];
+        case 5 -> days[4];
+        case 6 -> days[5];
+        case 7 -> days[6];
+        default -> "Invalid day";
+       };
+    }
+
     public static int getBlackjack(int num1, int num2){
        if (num1 > 21 && num2 > 21){
         return 0;
@@ -89,6 +122,4 @@ public class Assignments {
         return Math.max(num1, num2);
        }
     }
-
-
 }
