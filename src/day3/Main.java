@@ -4,7 +4,6 @@ import java.util.*;
 
 public class Main{
     public static void main(String[] args){
-        ArrayList<Payment> payments = new ArrayList<>();
         ArrayList<PaymentDetails> transactions = new ArrayList<>();
         Scanner sc = new Scanner(System.in);
 
