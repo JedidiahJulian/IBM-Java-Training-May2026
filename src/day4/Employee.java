@@ -22,4 +22,8 @@ public class Employee{
     public double getSalary(){
         return this.salary;
     }
+
+    public String toString(){
+        return this.name + " |  " + this.getDepartment() + " | $" + this.getSalary();
+    }
 }

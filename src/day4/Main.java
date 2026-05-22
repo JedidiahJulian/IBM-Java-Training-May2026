@@ -29,7 +29,7 @@ public class Main {
 
         System.out.println("==== Unique Employees ====");
         for (Employee employee : employeesCleanedList){
-            System.out.println(employee.getName() + " |  " + employee.getDepartment() + " | $" + employee.getSalary());
+            System.out.println(employee.toString());
         }
 
         for (Employee e : employees){
@@ -45,7 +45,7 @@ public class Main {
             System.out.println(dept + ": ");
             
             for (Employee e : map.get(dept)){
-                System.out.println(" - " + e.getName() + " | " + e.getDepartment() + " | $" + e.getSalary());
+                System.out.println(" - " +  e.toString());
             }
         }
 
@@ -58,7 +58,7 @@ public class Main {
                     currentHighest = e;
                 }
             }
-            System.out.println(dept + ": "  + currentHighest.getName() + " | " +  currentHighest.getDepartment() + " | $"  + currentHighest.getSalary());
+            System.out.println(dept + ": " + currentHighest.toString());
         }
 
         Collections.sort(employees, new Comparator<Employee>() {
@@ -69,7 +69,7 @@ public class Main {
 
         System.out.println("\n==== Employess Sorted by Salary (Desc) ====");
         for (Employee e : employees){
-            System.out.println(e.getName() + " | " + e.getDepartment() + " | $" + e.getSalary());
+            System.out.println(e.toString());
         }
 
 
