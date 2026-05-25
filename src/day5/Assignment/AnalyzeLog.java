@@ -67,7 +67,7 @@ public class AnalyzeLog {
                 }
             }
 
-            WriteFile("src/day5/Assignment/output.txt");
+            WriteFile("src/day5/Assignment/summary.txt");
             System.out.println("Summary created...");
 
         }catch(FileNotFoundException e){
