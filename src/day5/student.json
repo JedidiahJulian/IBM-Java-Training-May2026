@@ -1,0 +1,17 @@
+[
+ {
+  "id":"ABC123",
+  "name":"Juan Dela Cruz",
+  "course":"Computer Engineering"
+ },
+ {
+  "id":"XYZ123",
+  "name":"Taro Yamada",
+  "course":"Computer Science"
+ },
+ {
+  "id":"DEF123",
+  "name":"Gojo Satoru",
+  "course":"Information Technology"
+ }
+]
