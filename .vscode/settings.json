@@ -1,9 +1,10 @@
 {
-    "java.project.sourcePaths": [
-        "src",
-        "src\\day1"
-    ],
-    "java.project.referencedLibraries": [
-        "src\\day6\\lib\\postgresql-42.7.11.jar"
-    ]
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.import.maven.enabled": true,
+    "files.watcherExclude": {
+        "**/target/**": true
+    },
+    "search.exclude": {
+        "**/target": true
+    }
 }

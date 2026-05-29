@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LogAnalyzer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">IBM Java Training May 2026</a> &gt; <a href="index.source.html" class="el_package">day7</a> &gt; <span class="el_source">LogAnalyzer.java</span></div><h1>LogAnalyzer.java</h1><pre class="source lang-java linenums">package day7;
+
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+class MalformedLogEntryException extends Exception {
+    public MalformedLogEntryException(String msg) {
+<span class="fc" id="L10">        super(msg);</span>
+<span class="fc" id="L11">    }</span>
+}
+
+<span class="fc" id="L14">public class LogAnalyzer {</span>
+
+    public static void main(String[] args) {
+        //String filename = &quot;resources/server.log&quot;;
+<span class="fc" id="L18">    	String filename = args[0];</span>
+<span class="fc" id="L19">        Map&lt;String, Integer&gt; levelCount = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L20">        levelCount.put(&quot;INFO&quot;, 0);</span>
+<span class="fc" id="L21">        levelCount.put(&quot;WARN&quot;, 0);</span>
+<span class="fc" id="L22">        levelCount.put(&quot;ERROR&quot;, 0);</span>
+
+<span class="fc" id="L24">        List&lt;String&gt; errorMessages = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L25">        LocalDateTime earliest = null;</span>
+<span class="fc" id="L26">        LocalDateTime latest = null;</span>
+
+<span class="fc" id="L28">        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+
+<span class="fc" id="L30">        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {</span>
+
+            String line;
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            while ((line = br.readLine()) != null) {</span>
+                try {
+                    // Validate and parse
+<span class="fc bfc" id="L36" title="All 4 branches covered.">                    if (!line.startsWith(&quot;[&quot;) || !line.contains(&quot;]&quot;))</span>
+<span class="fc" id="L37">                        throw new MalformedLogEntryException(&quot;Missing timestamp brackets&quot;);</span>
+
+<span class="fc" id="L39">                    int endBracket = line.indexOf(&quot;]&quot;);</span>
+<span class="fc" id="L40">                    String timestampStr = line.substring(1, endBracket);</span>
+<span class="fc" id="L41">                    LocalDateTime timestamp = LocalDateTime.parse(timestampStr, formatter);</span>
+
+<span class="fc" id="L43">                    String rest = line.substring(endBracket + 2); // skip &quot;] &quot;</span>
+<span class="fc" id="L44">                    String[] parts = rest.split(&quot;: &quot;, 2);</span>
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">                    if (parts.length &lt; 2)</span>
+<span class="fc" id="L47">                        throw new MalformedLogEntryException(&quot;Missing message&quot;);</span>
+
+<span class="fc" id="L49">                    String level = parts[0];</span>
+<span class="fc" id="L50">                    String message = parts[1];</span>
+
+<span class="fc bfc" id="L52" title="All 6 branches covered.">                    if (!level.equals(&quot;INFO&quot;) &amp;&amp; !level.equals(&quot;WARN&quot;) &amp;&amp; !level.equals(&quot;ERROR&quot;))</span>
+<span class="fc" id="L53">                        throw new MalformedLogEntryException(&quot;Invalid log level&quot;);</span>
+
+                    // Count levels
+<span class="fc" id="L56">                    levelCount.put(level, levelCount.get(level) + 1);</span>
+
+                    // Collect error messages
+<span class="fc bfc" id="L59" title="All 2 branches covered.">                    if (level.equals(&quot;ERROR&quot;)) {</span>
+<span class="fc" id="L60">                        errorMessages.add(message);</span>
+                    }
+
+                    // Track earliest and latest timestamps
+<span class="fc bfc" id="L64" title="All 4 branches covered.">                    if (earliest == null || timestamp.isBefore(earliest))</span>
+<span class="fc" id="L65">                        earliest = timestamp;</span>
+
+<span class="fc bfc" id="L67" title="All 4 branches covered.">                    if (latest == null || timestamp.isAfter(latest))</span>
+<span class="fc" id="L68">                        latest = timestamp;</span>
+
+<span class="fc" id="L70">                } catch (MalformedLogEntryException e) {</span>
+<span class="fc" id="L71">                    System.out.println(&quot;Skipping malformed line: &quot; + line);</span>
+                }
+            }
+
+<span class="fc" id="L75">        } catch (FileNotFoundException e) {</span>
+<span class="fc" id="L76">            System.out.println(&quot;Log file not found.&quot;);</span>
+<span class="fc" id="L77">            return;</span>
+<span class="fc" id="L78">        } catch (IOException e) {</span>
+<span class="fc" id="L79">            System.out.println(&quot;Error reading file.&quot;);</span>
+<span class="fc" id="L80">            return;</span>
+        }
+
+        // Write summary
+<span class="fc" id="L84">        try (BufferedWriter bw = new BufferedWriter(new FileWriter(&quot;resources/summary.txt&quot;))) {</span>
+<span class="fc" id="L85">            bw.write(&quot;Log Summary Report\n&quot;);</span>
+<span class="fc" id="L86">            bw.write(&quot;------------------\n&quot;);</span>
+<span class="fc" id="L87">            bw.write(&quot;Total Entries: &quot; + (levelCount.get(&quot;INFO&quot;) + levelCount.get(&quot;WARN&quot;) + levelCount.get(&quot;ERROR&quot;)) + &quot;\n&quot;);</span>
+<span class="fc" id="L88">            bw.write(&quot;INFO: &quot; + levelCount.get(&quot;INFO&quot;) + &quot;\n&quot;);</span>
+<span class="fc" id="L89">            bw.write(&quot;WARN: &quot; + levelCount.get(&quot;WARN&quot;) + &quot;\n&quot;);</span>
+<span class="fc" id="L90">            bw.write(&quot;ERROR: &quot; + levelCount.get(&quot;ERROR&quot;) + &quot;\n\n&quot;);</span>
+
+<span class="fc" id="L92">            bw.write(&quot;Error Messages:\n&quot;);</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            for (String msg : errorMessages) {</span>
+<span class="fc" id="L94">                bw.write(&quot;- &quot; + msg + &quot;\n&quot;);</span>
+            }
+
+<span class="fc" id="L97">            bw.write(&quot;\nEarliest Timestamp: &quot; + earliest + &quot;\n&quot;);</span>
+<span class="fc" id="L98">            bw.write(&quot;Latest Timestamp: &quot; + latest + &quot;\n&quot;);</span>
+
+<span class="fc" id="L100">        } catch (IOException e) {</span>
+<span class="fc" id="L101">            System.out.println(&quot;Error writing summary file.&quot;);</span>
+        }
+
+<span class="fc" id="L104">        System.out.println(&quot;Analysis complete. Summary written to summary.txt&quot;);</span>
+<span class="fc" id="L105">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

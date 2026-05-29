@@ -1,0 +1,11 @@
+Log Summary Report
+------------------
+Total Entries: 3
+INFO: 2
+WARN: 1
+ERROR: 0
+
+Error Messages:
+
+Earliest Timestamp: 2026-05-29T06:00
+Latest Timestamp: 2026-05-29T12:00
