@@ -6,5 +6,6 @@
     },
     "search.exclude": {
         "**/target": true
-    }
+    },
+    "java.debug.settings.onBuildFailureProceed": true
 }

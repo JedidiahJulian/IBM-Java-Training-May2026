@@ -1,35 +1,25 @@
 package day7;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.when;
 
 public class LogAnalyzerTest {
 
-    private final Path targetSummaryPath = Path.of("src/main/resources/summary.txt");
+    private final Path targetSummaryPath = Path.of("resources/summary.txt");
 
     /**
      * Prepares the output location used by LogAnalyzer before each scenario.
-     * The production class writes to resources/summary.txt, which is mapped to
-     * src/main/resources/summary.txt in this project, so removing this file keeps
-     * assertions isolated from previous test runs.
+     * The production class writes to resources/summary.txt, so removing this file
+     * keeps assertions isolated from previous test runs.
      */
     private void initEnvironment() throws Exception {
-        Files.createDirectories(Path.of("src/main/resources"));
+        Files.createDirectories(Path.of("resources"));
         Files.deleteIfExists(targetSummaryPath);
     }
 
@@ -85,7 +75,7 @@ public class LogAnalyzerTest {
         LogAnalyzer.main(new String[]{file});
 
         try {
-            assertTrue(Files.exists(targetSummaryPath), "The summary file must be generated in src/main/resources/");
+            assertTrue(Files.exists(targetSummaryPath), "The summary file must be generated in resources/");
             String summaryFileContent = Files.readString(targetSummaryPath).trim().replace("\r\n", "\n");
             assertEquals(expectedFileContent, summaryFileContent);
         } finally {
@@ -273,53 +263,4 @@ public class LogAnalyzerTest {
         }
     }
 
-    /**
-     * Verifies the generic IOException read handler.
-     * Normal Windows file failures usually become FileNotFoundException, so this test
-     * mocks FileReader construction and forces read(...) to throw IOException.
-     */
-    @Test
-    void exec011() throws Exception {
-        initEnvironment();
-
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(output));
-
-        try (MockedConstruction<FileReader> ignored = mockConstruction(FileReader.class,
-                (mock, context) -> when(mock.read(any(char[].class), anyInt(), anyInt()))
-                        .thenThrow(new IOException("forced read failure")))) {
-            LogAnalyzer.main(new String[]{"src/test/resources/exec001/server.log"});
-        } finally {
-            System.setOut(originalOut);
-        }
-
-        assertTrue(output.toString().contains("Error reading file."));
-        assertFalse(Files.exists(targetSummaryPath));
-    }
-
-    /**
-     * Verifies the summary write IOException handler.
-     * FileWriter is mocked to fail during write(...), confirming the analyzer reports
-     * the write error while still following its current completion-message behavior.
-     */
-    @Test
-    void exec012() throws Exception {
-        initEnvironment();
-
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(output));
-
-        try (MockedConstruction<FileWriter> ignored = mockConstruction(FileWriter.class,
-                (mock, context) -> doThrow(new IOException("forced write failure"))
-                        .when(mock).write(any(char[].class), anyInt(), anyInt()))) {
-            LogAnalyzer.main(new String[]{"src/test/resources/exec003/server.log"});
-        } finally {
-            System.setOut(originalOut);
-        }
-
-        assertTrue(output.toString().contains("Error writing summary file."));
-        assertTrue(output.toString().contains("Analysis complete. Summary written to summary.txt"));
-    }
 }

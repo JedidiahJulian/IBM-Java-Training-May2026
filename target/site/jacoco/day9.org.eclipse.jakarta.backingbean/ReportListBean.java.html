@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportListBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">IBM Java Training May 2026</a> &gt; <a href="index.source.html" class="el_package">day9.org.eclipse.jakarta.backingbean</a> &gt; <span class="el_source">ReportListBean.java</span></div><h1>ReportListBean.java</h1><pre class="source lang-java linenums">package day9.org.eclipse.jakarta.backingbean;
+
+import java.io.Serializable;
+import java.util.List;
+
+import day9.org.eclipse.jakarta.dto.ReportDto;
+import day9.org.eclipse.jakarta.infrastracture.repository.ReportRepository;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+@Named
+@ViewScoped
+<span class="fc" id="L16">public class ReportListBean implements Serializable {</span>
+    private static final long serialVersionUID = 1L;
+	
+    private List&lt;ReportDto&gt; reports;
+    private ReportDto selectedReport;
+<span class="fc" id="L21">    private int selectedIndex = -1;</span>
+
+    @Inject
+    private ReportRepository reportRepository;
+
+    @PostConstruct
+    public void init() {
+<span class="fc" id="L28">        reports = reportRepository.findAll();</span>
+<span class="fc" id="L29">    }</span>
+    
+    public List&lt;ReportDto&gt; getReports() {
+<span class="fc" id="L32">        return reports;</span>
+    }
+
+    public void setReports(List&lt;ReportDto&gt; reports) {
+<span class="fc" id="L36">        this.reports = reports;</span>
+<span class="fc" id="L37">    }</span>
+
+    public ReportDto getSelectedReport() {
+<span class="fc" id="L40">        return selectedReport;</span>
+    }
+
+    public void setSelectedReport(ReportDto selectedReport) {
+<span class="fc" id="L44">        this.selectedReport = selectedReport;</span>
+<span class="fc" id="L45">    }</span>
+
+    public void prepareView(int index) {
+<span class="fc" id="L48">        selectedIndex = index;</span>
+<span class="fc" id="L49">        ReportDto report = reportRepository.findByIndex(index);</span>
+<span class="fc" id="L50">        selectedReport = copyReport(report);</span>
+<span class="fc" id="L51">    }</span>
+
+    public void prepareUpdate(int index) {
+<span class="fc" id="L54">        selectedIndex = index;</span>
+<span class="fc" id="L55">        ReportDto report = reportRepository.findByIndex(index);</span>
+<span class="fc" id="L56">        selectedReport = copyReport(report);</span>
+<span class="fc" id="L57">    }</span>
+
+    public void update() {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (selectedReport == null) {</span>
+<span class="fc" id="L61">            return;</span>
+        }
+
+<span class="fc" id="L64">        reportRepository.update(selectedIndex, selectedReport);</span>
+<span class="fc" id="L65">        reports = reportRepository.findAll();</span>
+<span class="fc" id="L66">        selectedReport = null;</span>
+<span class="fc" id="L67">        selectedIndex = -1;</span>
+<span class="fc" id="L68">    }</span>
+
+    public void delete(int index) {
+<span class="fc" id="L71">        reportRepository.delete(index);</span>
+<span class="fc" id="L72">        reports = reportRepository.findAll();</span>
+<span class="fc" id="L73">    }</span>
+
+    private ReportDto copyReport(ReportDto report) {
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (report == null) {</span>
+<span class="fc" id="L77">            return null;</span>
+        }
+
+<span class="fc" id="L80">        return new ReportDto(report.getTitle(), report.getDetail());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
