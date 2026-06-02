@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html" xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Report List</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css" />
+        <style>
+            body {
+                background-color: #f5f5f5;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 2rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .header h2 {
+                margin: 0;
+                font-size: 1.8rem;
+                font-weight: 600;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 2rem auto;
+                padding: 0 1rem;
+            }
+            .card {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                padding: 2rem;
+            }
+            .action-bar {
+                margin-bottom: 1.5rem;
+                display: flex;
+                justify-content: flex-end;
+            }
+            .row-actions {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+            .detail-text {
+                white-space: pre-wrap;
+                line-height: 1.5;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <div class="header">
+            <div class="container">
+                <h2>Report List</h2>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="card">
+                <div class="action-bar">
+                    <p:link outcome="/reportNew.xhtml" value="Add"
+                            styleClass="p-button p-button-success p-button-raised"/>
+                </div>
+
+                <h:form id="reportForm">
+                    <p:growl id="messages" showDetail="true" />
+
+                    <p:dataTable id="reportTable"
+                                 value="#{reportListBean.reports}" var="report"
+                                 rowIndexVar="rowIndex"
+                                 styleClass="p-datatable-striped"
+                                 paginator="true" rows="10"
+                                 emptyMessage="No Data Found">
+                        <p:column headerText="Title" sortBy="#{report.title}">
+                            <h:outputText value="#{report.title}" />
+                        </p:column>
+
+                        <p:column headerText="Actions" style="width: 260px">
+                            <div class="row-actions">
+                                <p:commandButton value="View"
+                                                 icon="pi pi-eye"
+                                                 actionListener="#{reportListBean.prepareView(rowIndex)}"
+                                                 process="@this"
+                                                 update=":reportForm:viewDialog"
+                                                 oncomplete="PF('viewReportDialog').show()"
+                                                 styleClass="p-button-info p-button-sm" />
+
+                                <p:commandButton value="Update"
+                                                 icon="pi pi-pencil"
+                                                 actionListener="#{reportListBean.prepareUpdate(rowIndex)}"
+                                                 process="@this"
+                                                 update=":reportForm:updateDialog"
+                                                 oncomplete="PF('updateReportDialog').show()"
+                                                 styleClass="p-button-warning p-button-sm" />
+
+                                <p:commandButton value="Delete"
+                                                 icon="pi pi-trash"
+                                                 actionListener="#{reportListBean.delete(rowIndex)}"
+                                                 process="@this"
+                                                 update=":reportForm:reportTable :reportForm:messages"
+                                                 styleClass="p-button-danger p-button-sm">
+                                    <p:confirm header="Confirm Delete"
+                                               message="Delete this report?"
+                                               icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:dialog id="viewDialog"
+                              widgetVar="viewReportDialog"
+                              header="View Report"
+                              modal="true"
+                              resizable="false"
+                              width="500">
+                        <h:panelGroup rendered="#{not empty reportListBean.selectedReport}">
+                            <div class="field">
+                                <strong>Title</strong>
+                                <div>
+                                    <h:outputText value="#{reportListBean.selectedReport.title}" />
+                                </div>
+                            </div>
+                            <div class="field">
+                                <strong>Detail</strong>
+                                <div class="detail-text">
+                                    <h:outputText value="#{reportListBean.selectedReport.detail}" />
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                    </p:dialog>
+
+                    <p:dialog id="updateDialog"
+                              widgetVar="updateReportDialog"
+                              header="Update Report"
+                              modal="true"
+                              resizable="false"
+                              width="500">
+                        <h:panelGroup rendered="#{not empty reportListBean.selectedReport}">
+                            <div class="ui-fluid">
+                                <div class="field">
+                                    <h:outputLabel for="update-title" value="Title" />
+                                    <p:inputText id="update-title"
+                                                 value="#{reportListBean.selectedReport.title}"
+                                                 required="true"
+                                                 requiredMessage="You cannot leave the title blank." />
+                                    <h:message for="update-title" style="color: red" />
+                                </div>
+                                <div class="field">
+                                    <h:outputLabel for="update-detail" value="Detail" />
+                                    <p:inputTextarea id="update-detail"
+                                                     value="#{reportListBean.selectedReport.detail}"
+                                                     rows="6" />
+                                </div>
+                            </div>
+                            <div class="flex justify-content-end gap-2">
+                                <p:commandButton value="Cancel"
+                                                 type="button"
+                                                 onclick="PF('updateReportDialog').hide()"
+                                                 styleClass="p-button-secondary" />
+                                <p:commandButton value="Save"
+                                                 icon="pi pi-check"
+                                                 actionListener="#{reportListBean.update()}"
+                                                 process=":reportForm:updateDialog"
+                                                 update=":reportForm:reportTable :reportForm:updateDialog :reportForm:messages"
+                                                 oncomplete="if (!args.validationFailed) PF('updateReportDialog').hide()" />
+                            </div>
+                        </h:panelGroup>
+                    </p:dialog>
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="No" type="button"
+                                         styleClass="ui-confirmdialog-no p-button-secondary"
+                                         icon="pi pi-times" />
+                        <p:commandButton value="Yes" type="button"
+                                         styleClass="ui-confirmdialog-yes p-button-danger"
+                                         icon="pi pi-check" />
+                    </p:confirmDialog>
+                </h:form>
+            </div>
+        </div>
+    </h:body>
+</html>
