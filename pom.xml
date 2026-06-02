@@ -24,7 +24,6 @@
         <surefire-plugin.version>3.5.3</surefire-plugin.version>
         <jacoco-plugin.version>0.8.12</jacoco-plugin.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
-        <mockito.version>5.15.2</mockito.version>
     </properties>
 
     <dependencies>
@@ -50,12 +49,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -85,6 +78,8 @@
                 <configuration>
                     <excludes>
                         <exclude>org/eclipse/jakarta/hello/**</exclude>
+                        <exclude>org/eclipse/jakarta/filter/**</exclude>
+                        <exclude>org/eclipse/jakarta/dto/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

@@ -6,28 +6,41 @@ import java.lang.reflect.Field;
 
 import org.eclipse.jakarta.dto.ReportDto;
 import org.eclipse.jakarta.infrastracture.repository.ReportRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class ReportNewBeanTest {
 
     @Test
-    void createStoresReportAndReturnsRedirect() throws Exception {
+    @DisplayName("Should create a new report and redirect to report list")
+    void testCreate() throws Exception {
         ReportRepository repository = new ReportRepository();
         ReportNewBean bean = new ReportNewBean();
         setField(bean, "reportRepository", repository);
 
-        bean.setTitle("Quarterly report");
-        bean.setDetail("Revenue increased");
+        bean.setTitle("Test Report");
+        bean.setDetail("This is a test report");
 
-        String redirect = bean.create();
+        String result = bean.create();
 
-        assertEquals("/reportList.xhtml?faces-redirect=true", redirect);
-        assertEquals("Quarterly report", bean.getTitle());
-        assertEquals("Revenue increased", bean.getDetail());
+        assertEquals("/reportList.xhtml?faces-redirect=true", result);
+        assertEquals(1, repository.findAll().size());
 
-        ReportDto created = repository.findByIndex(0);
-        assertEquals("Quarterly report", created.getTitle());
-        assertEquals("Revenue increased", created.getDetail());
+        ReportDto createdReport = repository.findByIndex(0);
+        assertEquals("Test Report", createdReport.getTitle());
+        assertEquals("This is a test report", createdReport.getDetail());
+    }
+
+    @Test
+    @DisplayName("Should update title and detail through accessors")
+    void testAccessors() {
+        ReportNewBean bean = new ReportNewBean();
+
+        bean.setTitle("Accessor Report");
+        bean.setDetail("Accessor detail");
+
+        assertEquals("Accessor Report", bean.getTitle());
+        assertEquals("Accessor detail", bean.getDetail());
     }
 
     private static void setField(Object target, String fieldName, Object value) throws Exception {
