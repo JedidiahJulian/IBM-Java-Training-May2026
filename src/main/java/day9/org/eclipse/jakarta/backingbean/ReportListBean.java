@@ -57,11 +57,11 @@ public class ReportListBean implements Serializable {
     }
 
     public void update() {
-        if (selectedReport == null) {
+        if (selectedReport == null || selectedReport.getId() == null) {
             return;
         }
 
-        reportRepository.update(selectedIndex, selectedReport);
+        reportRepository.updateById(selectedReport.getId(), selectedReport);
         reports = reportRepository.findAll();
         selectedReport = null;
         selectedIndex = -1;
@@ -77,6 +77,6 @@ public class ReportListBean implements Serializable {
             return null;
         }
 
-        return new ReportDto(report.getTitle(), report.getDetail());
+        return new ReportDto(report.getId(), report.getTitle(), report.getDetail());
     }
 }
